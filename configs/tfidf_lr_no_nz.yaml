@@ -1,0 +1,13 @@
+# Same as tfidf_lr.yaml but with NZ features disabled — ablation control.
+model: tfidf_lr
+params:
+  ngram_min: 1
+  ngram_max: 2
+  min_df: 2
+  max_df: 0.95
+  max_features: 50000
+  sublinear_tf: true
+  use_nz_features: false
+  C: 1.0
+  max_iter: 1000
+  class_weight: balanced

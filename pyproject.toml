@@ -53,7 +53,7 @@ dev = [
 [project.scripts]
 nzphish-prepare = "nzphish.data.prepare:main"
 nzphish-train = "nzphish.train:main"
-nzphish-eval = "nzphish.eval.run:main"
+nzphish-eval-stratified = "nzphish.eval.run:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
