@@ -1,0 +1,20 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "nz-phishing-selective-detection: NZ-localized phishing and smishing detection with class-conditional selective abstention"
+authors:
+  - family-names: Khan
+    given-names: Muhammad Shahnawaz
+    orcid: "https://orcid.org/0009-0007-4055-6563"
+    email: shahnawaz.jrw@gmail.com
+version: 0.1.0
+date-released: 2026-06-21
+license: MIT
+repository-code: "https://github.com/ShahnawazKakarh/nz-phishing-selective-detection"
+keywords:
+  - phishing detection
+  - smishing
+  - selective prediction
+  - abstention
+  - cybersecurity
+  - new zealand
+  - NLP
