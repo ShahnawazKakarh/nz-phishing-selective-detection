@@ -33,13 +33,24 @@ class TfidfLRConfig:
     C: float = 1.0
     max_iter: int = 1000
     class_weight: str | None = "balanced"
-    nz_feature_names: list[str] = field(default_factory=lambda: [
-        "impersonated_govt", "impersonated_bank", "impersonated_telco_utility",
-        "te_reo_salutation", "nz_lure_keyword_count", "nz_mobile_count",
-        "nz_landline_count", "nzd_mention_count", "nz_postcode_count",
-        "url_count", "suspicious_govt_lookalike", "suspicious_bank_lookalike",
-        "homoglyph_chars", "has_punycode",
-    ])
+    nz_feature_names: list[str] = field(
+        default_factory=lambda: [
+            "impersonated_govt",
+            "impersonated_bank",
+            "impersonated_telco_utility",
+            "te_reo_salutation",
+            "nz_lure_keyword_count",
+            "nz_mobile_count",
+            "nz_landline_count",
+            "nzd_mention_count",
+            "nz_postcode_count",
+            "url_count",
+            "suspicious_govt_lookalike",
+            "suspicious_bank_lookalike",
+            "homoglyph_chars",
+            "has_punycode",
+        ]
+    )
 
 
 def _nz_feature_matrix(texts: list[str], names: list[str]) -> sparse.csr_matrix:
@@ -75,7 +86,7 @@ class TfidfLR:
         nz = _nz_feature_matrix(texts, self.cfg.nz_feature_names)
         return sparse.hstack([tfidf, nz]).tocsr()
 
-    def fit(self, texts: list[str], labels: np.ndarray) -> "TfidfLR":
+    def fit(self, texts: list[str], labels: np.ndarray) -> TfidfLR:
         X = self._featurize(texts, fit=True)
         self.clf.fit(X, labels)
         return self
@@ -93,7 +104,7 @@ class TfidfLR:
             pickle.dump({"cfg": self.cfg, "vectorizer": self.vectorizer, "clf": self.clf}, f)
 
     @classmethod
-    def load(cls, path: Path) -> "TfidfLR":
+    def load(cls, path: Path) -> TfidfLR:
         with path.open("rb") as f:
             obj = pickle.load(f)
         m = cls(obj["cfg"])
