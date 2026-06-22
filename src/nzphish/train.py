@@ -1,9 +1,9 @@
-"""Training CLI: ``nzphish-train --config configs/tfidf_lr.yaml``.
+"""Training CLI: ``nzphish-train --config configs/<name>.yaml``.
 
-Loads splits from ``data/processed/``, fits the configured model, evaluates on
-val + test, writes metrics JSON to ``results/runs/{run_id}/``, and saves the
-fitted model + a per-sample probability dump (used downstream by the deferral
-layer for threshold calibration).
+Loads splits from ``data/processed/``, dispatches on the ``model:`` field in
+the config (``tfidf_lr`` or ``distilbert``), fits, evaluates on val + test,
+writes metrics JSON and per-sample probabilities to
+``results/runs/{run_id}/``, and saves the fitted model.
 """
 
 from __future__ import annotations
@@ -18,7 +18,6 @@ import pandas as pd
 import yaml
 
 from nzphish.eval.metrics import classification_metrics
-from nzphish.models.tfidf_lr import TfidfLR, TfidfLRConfig
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = REPO_ROOT / "data" / "processed"
@@ -27,7 +26,25 @@ RESULTS_DIR = REPO_ROOT / "results" / "runs"
 
 def _build_model(name: str, params: dict):
     if name == "tfidf_lr":
+        from nzphish.models.tfidf_lr import TfidfLR, TfidfLRConfig
+
         return TfidfLR(TfidfLRConfig(**params))
+    if name == "distilbert":
+        from nzphish.models.distilbert import DistilBertClassifier, DistilBertConfig
+
+        return DistilBertClassifier(DistilBertConfig(**params))
+    raise ValueError(f"unknown model: {name}")
+
+
+def _save_model(model, name: str, run_dir: Path) -> Path:
+    if name == "tfidf_lr":
+        out = run_dir / "model.pkl"
+        model.save(out)
+        return out
+    if name == "distilbert":
+        out = run_dir / "model"
+        model.save(out)
+        return out
     raise ValueError(f"unknown model: {name}")
 
 
@@ -70,7 +87,6 @@ def main(config_path: str, seed: int) -> None:
         prob = model.predict_proba(df["text"].astype(str).tolist())[:, 1]
         m = classification_metrics(df["label"].to_numpy(), prob)
         metrics["splits"][name] = m
-        # Persist per-sample probs for deferral calibration
         out_probs = pd.DataFrame(
             {
                 "id": df["id"].to_numpy(),
@@ -82,7 +98,7 @@ def main(config_path: str, seed: int) -> None:
         out_probs.to_parquet(out_dir / f"{name}_probs.parquet", index=False)
         click.echo(f"{name}: f1_phish={m['f1_phish']:.4f} auc={m['roc_auc']:.4f}")
 
-    model.save(out_dir / "model.pkl")
+    _save_model(model, model_name, out_dir)
     (out_dir / "metrics.json").write_text(json.dumps(metrics, indent=2, default=str))
     click.echo(f"wrote {out_dir / 'metrics.json'}")
 
