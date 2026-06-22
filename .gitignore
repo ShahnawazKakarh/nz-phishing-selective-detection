@@ -61,7 +61,7 @@ data/llm_cache/*
 
 # Model artifacts
 artifacts/
-models/
+/models/
 *.pt
 *.bin
 *.safetensors
