@@ -55,9 +55,17 @@ nzphish-prepare = "nzphish.data.prepare:main"
 nzphish-train = "nzphish.train:main"
 nzphish-eval-stratified = "nzphish.eval.run:main"
 
-[tool.setuptools.packages.find]
-where = ["src"]
-include = ["nzphish*"]
+[tool.setuptools]
+package-dir = {"" = "src"}
+packages = [
+    "nzphish",
+    "nzphish.data",
+    "nzphish.features",
+    "nzphish.models",
+    "nzphish.deferral",
+    "nzphish.eval",
+    "nzphish.utils",
+]
 
 [tool.ruff]
 line-length = 100
