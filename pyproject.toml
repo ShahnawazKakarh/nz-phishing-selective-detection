@@ -57,6 +57,7 @@ nzphish-eval-stratified = "nzphish.eval.run:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
+include = ["nzphish*"]
 
 [tool.ruff]
 line-length = 100
